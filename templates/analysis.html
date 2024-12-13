@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <title>Dashboard</title>
+  <style>
+    /* Additional CSS for increasing box shadow and other styles */
+    .row[style^="border"] {
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Increase box shadow */
+        border: none; /* Remove border */
+        border-radius: 5px; /* Add border radius */
+        padding: 10px; /* Add padding */
+        margin-top: 10px; /* Add margin to separate rows */
+    }
+    .row[style^="border"] .col {
+        padding: 10px; /* Add padding */
+    }
+    .navbar {
+      background-color: #ffffff;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Adjust shadow intensity */
+    }
+    .navbar-brand {
+      font-weight: bold;
+      font-size: 24px;
+    }
+    .navbar-nav .nav-link {
+      padding: 0.5rem 1rem;
+      font-size: 18px;
+    }
+    .btn-custom {
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      padding: 0.5rem 1rem;
+      margin-left: 10px;
+    }
+    body {
+        background-color: #f8f9fa; /* Set a light background color for the body */
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    th, td {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+    th {
+        background-color: #f2f2f2;
+    }
+  </style>
+</head>
+<body>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light">
+    <a class="navbar-brand" href="#">Web Traffic & SecureShield</a>
+    <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
+        <ul class="navbar-nav">
+            <li class="nav-item active">
+                <a class="nav-link" href="home"><i class="bi bi-house-door-fill"></i> Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="index"><i class="bi bi-bar-chart-fill"></i> Attacks</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="analysis"><i class="bi bi-speedometer2"></i> Dashboard</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-toggle="modal" data-target="#settingsModal"><i class="bi bi-gear-fill"></i> Settings</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="chatbot"><i class="bi bi-chat-dots-fill"></i> Chatbot</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="about"><i class="bi bi-info-circle-fill"></i> About Us</a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="ml-auto">
+        <button class="btn btn-custom" data-toggle="modal" data-target="#signInModal">Sign In</button>
+        <button class="btn btn-custom" data-toggle="modal" data-target="#signUpModal">Sign Up</button>
+    </div>
+</nav>
+
+<div class="container-fluid", style="margin-left:10%;>
+    <div class="row">
+        {% if titles %}
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <div class="container mt-4">
+                <h2 class="text-center">Traffic & Attacks Analysis Dashboard</h2>
+                <div class="col-md-12">
+                    <h3>Data Frame</h3>
+                    <div style="overflow-x: auto; overflow-y: auto; max-height: 400px; width:100%">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    {% for col in titles %}
+                                    <th>{{ col }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in df.values %}
+                                <tr>
+                                    {% for val in row %}
+                                    <td>{{ val }}</td>
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <hr>
+
+                            <!-- Main Information -->
+                <div class="row text-center mb-4">
+                    <div class="col-md-4">
+                        <div class="info-box border rounded py-3">
+                            <h5>{{total_features}}</h5>
+                            <p>total features</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="info-box border rounded py-3">
+                            <h5>{{total_records}}</h5>
+                            <p>total records</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="info-box border rounded py-3">
+                            <h5>{{num_attack_types}}</h5>
+                            <p>num attack types</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Information -->
+                <div class="row text-center mb-4">
+                    <div class="col-md-4">
+                        <div class="info-box border rounded py-3">
+                            <h5>{{most_frequent_attack}}</h5>
+                            <p>most frequent attack</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="info-box border rounded py-3">
+                            <h5>{{avg_src_bytes}}</h5>
+                            <p>avg src bytes</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="info-box border rounded py-3">
+                            <h5>{{avg_dst_bytes}}</h5>
+                            <p>avg dst bytes</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- More Data -->
+                <div class="row text-center mb-4">
+                    <div class="col-md-4">
+                        <div class="info-box border rounded py-3">
+                            <h5>{{avg_serror_rate}}</h5>
+                            <p>avg serror rate</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="info-box border rounded py-3">
+                            <h5>{{percentage_logged_in}}</h5>
+                            <p>percentage logged in</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="info-box border rounded py-3">
+                            <h5>{{avg_same_srv_rate}}</h5>
+                            <p>avg same srv rate</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Final Information -->
+                <div class="row text-center mb-4">
+                    <div class="col-md-12">
+                        <div class="info-box border rounded py-3">
+                            <h5>{{percentage_attacks}}</h5>
+                            <p>percentage attacks</p>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+
+                    <div class="row text-center mb-4" style="border:1px solid black; border-radius:5px;">
+                        <h3 class="w-100 py-3">Protocols Vs Attacks</h3>
+                        <img src="{{ url_for('static', filename='img1.png') }}" class="img-fluid" alt="Traffic Analysis">
+                    </div>
+
+                    <hr>
+
+                    <div class="row text-center mb-4" style="border:1px solid black; border-radius:5px;">
+                        <h3 class="w-100 py-3">Service Distribution & Attack Distribution</h3>
+                        <img src="{{ url_for('static', filename='img2.png') }}" class="img-fluid" alt="Traffic Analysis">
+                    </div>
+
+                    <hr>
+
+                    <div class="row text-center mb-4" style="border:1px solid black; border-radius:5px;">
+                        <h3 class="w-100 py-3">Errors Rates By Attacks Types</h3>
+                        <img src="{{ url_for('static', filename='img3.png') }}" class="img-fluid" alt="Traffic Analysis">
+                    </div>
+
+                <hr>
+                    <div class="row text-center mb-4" style="border:1px solid black; border-radius:5px;">
+                        <h3 class="w-100 py-3">Flags Vs Attacks Types</h3>
+                        <img src="{{ url_for('static', filename='img4.png') }}" class="img-fluid" alt="Traffic Analysis">
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        {% endif %}
+
+
+    </div>
+</div>
+
+<!-- Modals -->
+<!-- Sign In Modal -->
+<div class="modal fade" id="signInModal" tabindex="-1" role="dialog" aria-labelledby="signInModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="signInModalLabel">Sign In</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="signInEmail">Email address</label>
+                        <input type="email" class="form-control" id="signInEmail" placeholder="Enter email">
+                    </div>
+                    <div class="form-group">
+                        <label for="signInPassword">Password</label>
+                        <input type="password" class="form-control" id="signInPassword" placeholder="Password">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Sign In</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sign Up Modal -->
+<div class="modal fade" id="signUpModal" tabindex="-1" role="dialog" aria-labelledby="signUpModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="signUpModalLabel">Sign Up</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="signUpName">Name</label>
+                        <input type="text" class="form-control" id="signUpName" placeholder="Enter your name">
+                    </div>
+                    <div class="form-group">
+                        <label for="signUpEmail">Email address</label>
+                        <input type="email" class="form-control" id="signUpEmail" placeholder="Enter email">
+                    </div>
+                    <div class="form-group">
+                        <label for="signUpPassword">Password</label>
+                        <input type="password" class="form-control" id="signUpPassword" placeholder="Password">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Sign Up</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="modal fade" id="settingsModal" tabindex="-1" role="dialog" aria-labelledby="settingsModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="settingsModalLabel">Settings</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Settings content goes here.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

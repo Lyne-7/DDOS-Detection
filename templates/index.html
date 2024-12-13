@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prediction Page</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons CSS (Change to Font Awesome if preferred) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+</head>
+<style>
+   .navbar {
+      background-color: #ffffff;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Adjust shadow intensity */
+    }
+    .navbar-brand {
+      font-weight: bold;
+      font-size: 24px;
+    }
+    .navbar-nav .nav-link {
+      padding: 0.5rem 1rem;
+      font-size: 18px;
+    }
+    .btn-custom {
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      padding: 0.5rem 1rem;
+      margin-left: 10px;
+    }
+    .container {
+        display: flex;
+        margin-top:50px;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+    .form-container {
+    width: 100%; /* Adjust the width of the form container */
+    padding: 20px;
+    background-color: #f8f9fa; /* Change background color */
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2); /* Increase shadow intensity */
+}
+
+.form-row {
+    margin-bottom: 20px; /* Add space between rows */
+}
+
+.form-group {
+    margin-bottom: 15px; /* Add space between form groups */
+}
+
+.form-control {
+    border-radius: 5px; /* Rounded corners for input fields */
+}
+
+.btn-primary {
+    border-radius: 5px; /* Rounded corners for buttons */
+}
+
+
+    .image-container {
+        width: 30%; /* Adjust the width of the image container */
+    }
+
+    .image img {
+        width: 100%;
+        height: auto;
+    }
+      .modal-content {
+    background-color: #1c1c1c; /* Dark background */
+    color: #e0e0e0; /* Light text color */
+    border-radius: 10px;
+    border: 2px solid #ff0000; /* Red border for attack detection */
+  }
+
+  .modal-header {
+    border-bottom: 1px solid #ff0000; /* Red bottom border */
+  }
+
+  .modal-title {
+    color: #ff0000; /* Red title */
+  }
+
+  .result-message {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+
+  .alert-container {
+    margin-top: 10px;
+  }
+
+  .alert {
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+
+  .alert-info {
+    background-color: #1e90ff;
+    color: white;
+  }
+
+  .alert-warning {
+    background-color: #ffcc00;
+    color: black;
+  }
+
+  .alert-danger {
+    background-color: #ff0000;
+    color: white;
+  }
+</style>
+<body>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light">
+    <a class="navbar-brand" href="#">Web Traffic & SecureShield</a>
+    <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
+        <ul class="navbar-nav">
+            <li class="nav-item active">
+                <a class="nav-link" href="home"><i class="bi bi-house-door-fill"></i> Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="index"><i class="bi bi-bar-chart-fill"></i> Attacks</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="analysis"><i class="bi bi-speedometer2"></i> Dashboard</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-toggle="modal" data-target="#settingsModal"><i class="bi bi-gear-fill"></i> Settings</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="chatbot"><i class="bi bi-chat-dots-fill"></i> Chatbot</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="about"><i class="bi bi-info-circle-fill"></i> About Us</a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="ml-auto">
+        <button class="btn btn-custom" data-toggle="modal" data-target="#signInModal">Sign In</button>
+        <button class="btn btn-custom" data-toggle="modal" data-target="#signUpModal">Sign Up</button>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="form-container mt-3 my-3" style="margin-top:5px;">
+        <form id="predictionForm">
+            <!-- Row 1 -->
+            <div class="form-row">
+                <div class="form-group col-md-2">
+                    <label for="duration">Duration</label>
+                    <input type="number" class="form-control" name="duration" id="duration" value="0" placeholder="Enter Duration">
+                </div>
+                <div class="form-group col-md-2">
+                    <label for="protocol_type">Protocol Type</label>
+                    <select class="form-control" name="protocol_type" id="protocol_type">
+                        <option value="tcp">TCP</option>
+                        <option value="udp" selected>UDP</option>
+                        <option value="icmp">ICMP</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-2">
+                    <label for="service">Service</label>
+                    <select class="form-control" name="service" id="service">
+                        <option value="other" selected>Other</option>
+                        <option value="private">Private</option>
+                        <option value="http">HTTP</option>
+                        <option value="remote_job">Remote Job</option>
+                        <option value="ftp_data">FTP Data</option>
+                        <option value="name">Name</option>
+                        <option value="netbios_ns">NetBIOS NS</option>
+                        <option value="eco_i">ECO I</option>
+                        <option value="mtp">MTP</option>
+                        <option value="telnet">Telnet</option>
+                        <option value="finger">Finger</option>
+                        <option value="domain_u">Domain U</option>
+                        <option value="supdup">Supdup</option>
+                        <option value="uucp_path">UUCP Path</option>
+                        <option value="Z39_50">Z39.50</option>
+                        <option value="smtp">SMTP</option>
+                        <option value="csnet_ns">CSNET NS</option>
+                        <option value="uucp">UUCP</option>
+                        <option value="netbios_dgm">NetBIOS DGM</option>
+                        <option value="urp_i">URP I</option>
+                        <option value="auth">Auth</option>
+                        <option value="domain">Domain</option>
+                        <option value="ftp">FTP</option>
+                        <option value="bgp">BGP</option>
+                        <option value="ldap">LDAP</option>
+                        <option value="ecr_i">ECR I</option>
+                        <option value="gopher">Gopher</option>
+                        <option value="vmnet">VMNET</option>
+                        <option value="systat">SYSTAT</option>
+                        <option value="http_443">HTTP 443</option>
+                        <option value="efs">EFS</option>
+                        <option value="whois">WHOIS</option>
+                        <option value="imap4">IMAP4</option>
+                        <option value="iso_tsap">ISO TSAP</option>
+                        <option value="echo">Echo</option>
+                        <option value="klogin">Klogin</option>
+                        <option value="link">Link</option>
+                        <option value="sunrpc">SunRPC</option>
+                        <option value="login">Login</option>
+                        <option value="kshell">Kshell</option>
+                        <option value="sql_net">SQL Net</option>
+                        <option value="time">Time</option>
+                        <option value="hostnames">Hostnames</option>
+                        <option value="exec">Exec</option>
+                        <option value="ntp_u">NTP U</option>
+                        <option value="discard">Discard</option>
+                        <option value="nntp">NNTP</option>
+                        <option value="courier">Courier</option>
+                        <option value="ctf">CTF</option>
+                        <option value="ssh">SSH</option>
+                        <option value="daytime">Daytime</option>
+                        <option value="shell">Shell</option>
+                        <option value="netstat">Netstat</option>
+                        <option value="pop_3">POP 3</option>
+                        <option value="nnsp">NNSP</option>
+                        <option value="IRC">IRC</option>
+                        <option value="pop_2">POP 2</option>
+                        <option value="printer">Printer</option>
+                        <option value="tim_i">TIM I</option>
+                        <option value="pm_dump">PM Dump</option>
+                        <option value="red_i">RED I</option>
+                        <option value="netbios_ssn">NetBIOS SSN</option>
+                        <option value="rje">RJE</option>
+                        <option value="X11">X11</option>
+                        <option value="urh_i">URH I</option>
+                        <option value="http_8001">HTTP 8001</option>
+                        <option value="aol">AOL</option>
+                        <option value="http_2784">HTTP 2784</option>
+                        <option value="tftp_u">TFTP U</option>
+                        <option value="harvest">Harvest</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-2">
+                    <label for="flag">Flag</label>
+                    <select class="form-control" name="flag" id="flag">
+                        <option value="SF" selected>SF</option>
+                        <option value="S0">S0</option>
+                        <option value="REJ">REJ</option>
+                        <option value="RSTR">RSTR</option>
+                        <option value="SH">SH</option>
+                        <option value="RSTO">RSTO</option>
+                        <option value="S1">S1</option>
+                        <option value="RSTOS0">RSTOS0</option>
+                        <option value="S3">S3</option>
+                        <option value="S2">S2</option>
+                        <option value="OTH">OTH</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-2">
+                    <label for="src_bytes">Source Bytes</label>
+                    <input type="number" class="form-control" name="src_bytes" id="src_bytes" value="146" placeholder="Enter Source Bytes">
+                </div>
+            </div>
+
+            <!-- Row 2 -->
+            <div class="form-row">
+                <div class="form-group col-md-2">
+                    <label for="dst_bytes">Destination Bytes</label>
+                    <input type="number" class="form-control" name="dst_bytes" id="dst_bytes" value="0" placeholder="Enter Destination Bytes">
+                </div>
+                <div class="form-group col-md-2">
+                    <label for="logged_in">Logged In</label>
+                    <input type="number" class="form-control" name="logged_in" id="logged_in" value="0" placeholder="Enter Logged In">
+                </div>
+                <div class="form-group col-md-2">
+                    <label for="count">Count</label>
+                    <input type="number" class="form-control" name="count" id="count" value="13" placeholder="Enter Count">
+                </div>
+                <div class="form-group col-md-2">
+                    <label for="srv_count">Service Count</label>
+                    <input type="number" class="form-control" name="srv_count" id="srv_count" value="1" placeholder="Enter Service Count">
+                </div>
+                <div class="form-group col-md-2">
+                    <label for="serror_rate">Service Error Rate</label>
+                    <input type="number" step="0.01" class="form-control" name="serror_rate" id="serror_rate" value="0.0" placeholder="Enter Service Error Rate">
+                </div>
+            </div>
+
+            <!-- Row 3 -->
+            <div class="form-row">
+                <div class="form-group col-md-2">
+                    <label for="srv_serror_rate">Service Service Error Rate</label>
+                    <input type="number" step="0.01" class="form-control" name="srv_serror_rate" id="srv_serror_rate" value="0.0" placeholder="Enter Service Service Error Rate">
+                </div>
+                <div class="form-group col-md-2">
+                    <label for="rerror_rate">Rerror Rate</label>
+                    <input type="number" step="0.01" class="form-control" name="rerror_rate" id="rerror_rate" value="0.0" placeholder="Enter Rerror Rate">
+                </div>
+                <div class="form-group col-md-2">
+                    <label for="same_srv_rate">Same Service Rate</label>
+                    <input type="number" step="0.01" class="form-control" name="same_srv_rate" id="same_srv_rate" value="0.08" placeholder="Enter Same Service Rate">
+                </div>
+                <div class="form-group col-md-2">
+                    <label for="dst_host_count">Destination Host Count</label>
+                    <input type="number" class="form-control" name="dst_host_count" id="dst_host_count" value="255" placeholder="Enter Destination Host Count">
+                </div>
+                <div class="form-group col-md-2">
+                    <label for="dst_host_srv_count">Destination Host Service Count</label>
+                    <input type="number" class="form-control" name="dst_host_srv_count" id="dst_host_srv_count" value="1" placeholder="Enter Destination Host Service Count">
+                </div>
+            </div>
+
+            <button style="width:66%;" type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+</div>
+    <!-- Modal HTML -->
+    <div class="modal fade" id="resultModal" tabindex="-1" role="dialog" aria-labelledby="resultModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="resultModalLabel">Detection Result</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="result-message"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('predictionForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the form from submitting the traditional way
+
+            var formData = new FormData(this);
+
+            fetch('/pred', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                var modalTitle = document.getElementById('resultModalLabel');
+                var resultMessage = document.querySelector('.result-message');
+
+                if (data.prediction === 'Alert Detected!') {
+                    modalTitle.textContent = 'Alert Detected!';
+                    resultMessage.innerHTML = `
+                        <div class="alert alert-danger">Immediate action required: An attack was detected in the network.</div>
+                        <div class="alert alert-warning">Check the logs for more details and investigate the source of the attack.</div>
+                        <div class="alert alert-info">Consider enhancing your security measures and running a full system scan.</div>
+                    `;
+                } else {
+                    modalTitle.textContent = 'All Clear';
+                    resultMessage.innerHTML = `
+                        <div class="alert alert-info">The system has scanned and no suspicious activity was detected.</div>
+                        <div class="alert alert-info">Continue monitoring the network as usual.</div>
+                    `;
+                }
+
+                $('#resultModal').modal('show'); // Show the modal
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+
+
+
+<!--signin and signup modals-->
+<!-- Sign In Modal -->
+<div class="modal fade" id="signInModal" tabindex="-1" role="dialog" aria-labelledby="signInModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="signInModalLabel">Sign In</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Sign In Form -->
+        <form action="/signin" method="post">
+          <div class="form-group">
+            <label for="signInEmail">Email address</label>
+            <input type="email" class="form-control" id="signInEmail" name="email" aria-describedby="emailHelp" placeholder="Enter email">
+          </div>
+          <div class="form-group">
+            <label for="signInPassword">Password</label>
+            <input type="password" class="form-control" id="signInPassword"  name="password" placeholder="Password">
+          </div>
+          <button type="submit" class="btn btn-primary">Sign In</button>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Sign Up Modal -->
+<div class="modal fade" id="signUpModal" tabindex="-1" role="dialog" aria-labelledby="signUpModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="signUpModalLabel">Sign Up</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Sign Up Form -->
+        <form action="signup" method="post">
+            <div class="form-group">
+            <label for="firstname">First Name</label>
+            <input type="text" class="form-control" id="firstname" name="firstname" aria-describedby="emailHelp" placeholder="Enter First Name">
+          </div>
+            <div class="form-group">
+            <label for="lastname">Last Name</label>
+            <input type="text" class="form-control" id="lastname" name="lastname" aria-describedby="emailHelp" placeholder="Enter Last Name">
+          </div>
+          <div class="form-group">
+            <label for="signUpEmail">Email address</label>
+            <input type="email" class="form-control" id="signUpEmail" name="email" aria-describedby="emailHelp" placeholder="Enter email">
+          </div>
+          <div class="form-group">
+            <label for="signUpPassword">Password</label>
+            <input type="password" class="form-control" id="signUpPassword" name="password" placeholder="Password">
+          </div>
+          <button type="submit" class="btn btn-primary">Sign Up</button>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<!-- Settings Modal -->
+<div class="modal fade" id="settingsModal" tabindex="-1" role="dialog" aria-labelledby="settingsModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="settingsModalLabel">Settings</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h5>Zoom:</h5>
+                <button class="btn btn-primary" onclick="zoomIn()">Zoom In</button>
+                <button class="btn btn-primary" onclick="zoomOut()">Zoom Out</button>
+                <hr>
+                <h5>Color Theme:</h5>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="colorTheme" id="colorThemeDefault" value="default" checked>
+                    <label class="form-check-label" for="colorThemeDefault">
+                        Default
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="colorTheme" id="colorThemeRed" value="red">
+                    <label class="form-check-label" for="colorThemeRed">
+                        Red Mode
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="colorTheme" id="colorThemeDark" value="dark">
+                    <label class="form-check-label" for="colorThemeDark">
+                        Dark Mode
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="colorTheme" id="colorThemeBlue" value="blue">
+                    <label class="form-check-label" for="colorThemeBlue">
+                        Blue Mode
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="colorTheme" id="colorThemeGreen" value="green">
+                    <label class="form-check-label" for="colorThemeGreen">
+                        Green Mode
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="applySettings()">Apply</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function zoomIn() {
+        // Increase font size
+        document.body.style.fontSize = "120%";
+    }
+
+    function zoomOut() {
+        // Decrease font size
+        document.body.style.fontSize = "100%";
+    }
+
+    function applySettings() {
+        // Apply selected color theme
+        var selectedTheme = document.querySelector('input[name="colorTheme"]:checked').value;
+        switch (selectedTheme) {
+            case "dark":
+                document.body.style.backgroundColor = "#333";
+                document.body.style.color = "#f8f9fa";
+                // Apply dark mode styles to navbar, buttons, etc.
+                break;
+            case "red":
+                document.body.style.backgroundColor = "#f8d7da";
+                document.body.style.color = "#721c24";
+                // Apply red mode styles to navbar, buttons, etc.
+                break;
+            case "blue":
+                document.body.style.backgroundColor = "#d3e0f0";
+                document.body.style.color = "#003d7a";
+                // Apply blue mode styles to navbar, buttons, etc.
+                break;
+            case "green":
+                document.body.style.backgroundColor = "#e0f2f1";
+                document.body.style.color = "#004d40";
+                // Apply green mode styles to navbar, buttons, etc.
+                break;
+            default:
+                // Default theme
+                document.body.style.backgroundColor = "#ffffff";
+                document.body.style.color = "#000000";
+                // Revert other elements to default styles
+                break;
+        }
+    }
+</script>
+
+
+
+
+<!-- jQuery and Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>

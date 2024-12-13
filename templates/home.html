@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home Page</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    /* Default Theme */
+    body {
+      background-color: #ffffff;
+      color: #000;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .navbar {
+      background-color: #ffffff;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .navbar-brand {
+      font-weight: bold;
+      font-size: 24px;
+    }
+    .navbar-nav .nav-link {
+      padding: 0.5rem 1rem;
+      font-size: 18px;
+    }
+    .btn-custom {
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      padding: 0.5rem 1rem;
+      margin-left: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .btn-custom:hover {
+      background-color: #0056b3;
+    }
+    .carousel-item {
+      height: 100vh;
+    }
+    .video-background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    .video-background video {
+      min-width: 100%;
+      min-height: 100%;
+      width: auto;
+      height: auto;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .container-box-shadow {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      padding: 20px;
+      background-color: rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    }
+    .welcome-text {
+      color: #000;
+      font-size: 48px;
+      font-weight: bold;
+    }
+    .btn-prediction {
+      background-color: #28a745;
+      color: #fff;
+      border: none;
+      padding: 0.5rem 1rem;
+      margin-top: 20px;
+      margin-right: 10px;
+    }
+    .btn-dashboard {
+      background-color: #ffc107;
+      color: #000;
+      border: none;
+      padding: 0.5rem 1rem;
+      margin-top: 20px;
+    }
+    .carousel-links {
+      margin-top: 20px;
+    }
+    .carousel-links .nav-link {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      font-size: 18px;
+    }
+
+    /* Dark Theme */
+    .theme-dark {
+      background-color: #333;
+      color: #f8f9fa;
+    }
+    .theme-dark .navbar {
+      background-color: #444;
+    }
+    .theme-dark .btn-custom {
+      background-color: #0056b3;
+    }
+    .theme-dark .btn-custom:hover {
+      background-color: #003d7a;
+    }
+
+    /* Red Theme */
+    .theme-red {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    .theme-red .navbar {
+      background-color: #f5c6cb;
+    }
+    .theme-red .btn-custom {
+      background-color: #721c24;
+    }
+    .theme-red .btn-custom:hover {
+      background-color: #491217;
+    }
+
+    /* Additional Themes */
+    .theme-blue {
+      background-color: #d3e0f0;
+      color: #003d7a;
+    }
+    .theme-blue .navbar {
+      background-color: #b3c6f7;
+    }
+    .theme-green {
+      background-color: #e0f2f1;
+      color: #004d40;
+    }
+    .theme-green .navbar {
+      background-color: #b2dfdb;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light">
+    <a class="navbar-brand" href="#">Web Traffic & SecureShield</a>
+    <div class="collapse navbar-collapse justify-content-center" id="navbarSupportedContent">
+        <ul class="navbar-nav">
+            <li class="nav-item active">
+                <a class="nav-link" href="home"><i class="bi bi-house-door-fill"></i> Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="index"><i class="bi bi-bar-chart-fill"></i> Attacks</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="analysis"><i class="bi bi-speedometer2"></i> Dashboard</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-toggle="modal" data-target="#settingsModal"><i class="bi bi-gear-fill"></i> Settings</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="chatbot"><i class="bi bi-chat-dots-fill"></i> Chatbot</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="about"><i class="bi bi-info-circle-fill"></i> About Us</a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="ml-auto">
+        <button class="btn btn-custom" data-toggle="modal" data-target="#signInModal">Sign In</button>
+        <button class="btn btn-custom" data-toggle="modal" data-target="#signUpModal">Sign Up</button>
+    </div>
+</nav>
+
+<!-- Messages -->
+{% if signup_message %}
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+  <strong>Success!</strong> {{signup_message}}
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
+{% if signin_message %}
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+  <strong>Success!</strong> {{signin_message}}
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
+{% if message_must_sign %}
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+  <strong>Warning!</strong> {{message_must_sign}}
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
+{% if signin_error %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+  <strong>Error!</strong> {{signin_error}}
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
+
+<!-- Carousel with Background Video -->
+<div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
+  <div class="carousel-inner">
+    <div class="carousel-item active">
+      <div class="video-background">
+        <video autoplay muted loop>
+          <source src="{{url_for('static', filename='v2.mp4')}}" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+      <div class="container-box-shadow">
+        <div class="welcome-text">
+          <h1>Welcome to Our Website</h1>
+          <p>Learn more about our services.</p>
+          <a class="btn btn-prediction" href="index">Attacks</a>
+          <a class="btn btn-dashboard" href="analysis">Dashboard</a>
+        </div>
+        <!-- Navbar Links in Carousel -->
+        <div class="carousel-links">
+          <a class="nav-link" href="home"><i class="bi bi-house-door-fill"></i> Home</a>
+          <a class="nav-link" href="index"><i class="bi bi-bar-chart-fill"></i> Attacks</a>
+          <a class="nav-link" href="analysis"><i class="bi bi-speedometer2"></i> Dashboard</a>
+          <a class="nav-link" href="#" data-toggle="modal" data-target="#settingsModal"><i class="bi bi-gear-fill"></i> Settings</a>
+          <a class="nav-link" href="chatbot"><i class="bi bi-chat-dots-fill"></i> Chatbot</a>
+          <a class="nav-link" href="about"><i class="bi bi-info-circle-fill"></i> About Us</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="sr-only">Previous</span>
+  </a>
+  <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="sr-only">Next</span>
+  </a>
+</div>
+
+<!-- Modals -->
+
+
+<!--signin and signup modals-->
+<!-- Sign In Modal -->
+<div class="modal fade" id="signInModal" tabindex="-1" role="dialog" aria-labelledby="signInModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="signInModalLabel">Sign In</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Sign In Form -->
+        <form action="/signin" method="post">
+          <div class="form-group">
+            <label for="signInEmail">Email address</label>
+            <input type="email" class="form-control" id="signInEmail" name="email" aria-describedby="emailHelp" placeholder="Enter email">
+          </div>
+          <div class="form-group">
+            <label for="signInPassword">Password</label>
+            <input type="password" class="form-control" id="signInPassword"  name="password" placeholder="Password">
+          </div>
+          <button type="submit" class="btn btn-primary">Sign In</button>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Sign Up Modal -->
+<div class="modal fade" id="signUpModal" tabindex="-1" role="dialog" aria-labelledby="signUpModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="signUpModalLabel">Sign Up</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Sign Up Form -->
+        <form action="signup" method="post">
+            <div class="form-group">
+            <label for="firstname">First Name</label>
+            <input type="text" class="form-control" id="firstname" name="firstname" aria-describedby="emailHelp" placeholder="Enter First Name">
+          </div>
+            <div class="form-group">
+            <label for="lastname">Last Name</label>
+            <input type="text" class="form-control" id="lastname" name="lastname" aria-describedby="emailHelp" placeholder="Enter Last Name">
+          </div>
+          <div class="form-group">
+            <label for="signUpEmail">Email address</label>
+            <input type="email" class="form-control" id="signUpEmail" name="email" aria-describedby="emailHelp" placeholder="Enter email">
+          </div>
+          <div class="form-group">
+            <label for="signUpPassword">Password</label>
+            <input type="password" class="form-control" id="signUpPassword" name="password" placeholder="Password">
+          </div>
+          <button type="submit" class="btn btn-primary">Sign Up</button>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<!-- Settings Modal -->
+<div class="modal fade" id="settingsModal" tabindex="-1" role="dialog" aria-labelledby="settingsModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="settingsModalLabel">Settings</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h5>Zoom:</h5>
+                <button class="btn btn-primary" onclick="zoomIn()">Zoom In</button>
+                <button class="btn btn-primary" onclick="zoomOut()">Zoom Out</button>
+                <hr>
+                <h5>Color Theme:</h5>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="colorTheme" id="colorThemeDefault" value="default" checked>
+                    <label class="form-check-label" for="colorThemeDefault">
+                        Default
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="colorTheme" id="colorThemeRed" value="red">
+                    <label class="form-check-label" for="colorThemeRed">
+                        Red Mode
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="colorTheme" id="colorThemeDark" value="dark">
+                    <label class="form-check-label" for="colorThemeDark">
+                        Dark Mode
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="colorTheme" id="colorThemeBlue" value="blue">
+                    <label class="form-check-label" for="colorThemeBlue">
+                        Blue Mode
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="colorTheme" id="colorThemeGreen" value="green">
+                    <label class="form-check-label" for="colorThemeGreen">
+                        Green Mode
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="applySettings()">Apply</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function zoomIn() {
+        // Increase font size
+        document.body.style.fontSize = "120%";
+    }
+
+    function zoomOut() {
+        // Decrease font size
+        document.body.style.fontSize = "100%";
+    }
+
+    function applySettings() {
+        // Apply selected color theme
+        var selectedTheme = document.querySelector('input[name="colorTheme"]:checked').value;
+        switch (selectedTheme) {
+            case "dark":
+                document.body.style.backgroundColor = "#333";
+                document.body.style.color = "#f8f9fa";
+                // Apply dark mode styles to navbar, buttons, etc.
+                break;
+            case "red":
+                document.body.style.backgroundColor = "#f8d7da";
+                document.body.style.color = "#721c24";
+                // Apply red mode styles to navbar, buttons, etc.
+                break;
+            case "blue":
+                document.body.style.backgroundColor = "#d3e0f0";
+                document.body.style.color = "#003d7a";
+                // Apply blue mode styles to navbar, buttons, etc.
+                break;
+            case "green":
+                document.body.style.backgroundColor = "#e0f2f1";
+                document.body.style.color = "#004d40";
+                // Apply green mode styles to navbar, buttons, etc.
+                break;
+            default:
+                // Default theme
+                document.body.style.backgroundColor = "#ffffff";
+                document.body.style.color = "#000000";
+                // Revert other elements to default styles
+                break;
+        }
+    }
+</script>
+
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
