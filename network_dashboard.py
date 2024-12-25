@@ -1,15 +1,14 @@
-from scapy.all import sniff
 from dash import Dash, dcc, html
 from dash.dependencies import Input, Output
 import plotly.graph_objs as go
 from collections import deque
 import threading
+import time
 
-# Initialize Dash app
 app = Dash(__name__)
 
-# Data storage for live updates
 packet_data = deque(maxlen=100)  # Store up to 100 packets
+alerts = []  # Store DDoS alerts
 
 # Define the dashboard layout
 app.layout = html.Div([
@@ -28,6 +27,11 @@ app.layout = html.Div([
         style={
             'padding': '20px'
         }
+    ),
+    html.Div(
+        html.H3("Alerts"),
+        html.Div(id="alerts-container", style={"padding": "10px", "backgroundColor": "#f8d7da", "color": "#721c24"}),
+        style={"padding": "10px", "backgroundColor": "#f8d7da", "marginTop": "20px"}
     ),
     dcc.Interval(
         id='interval-component',
@@ -77,15 +81,30 @@ def update_graph_live(n):
 
     return figure
 
-# Add the callback to the app
+# Callback to update alerts
+def update_alerts(n):
+    global alerts
+    
+    if len(alerts) == 0:
+        return "No alerts yet."
+    
+    latest_alert = alerts[-1]  # Get the latest alert
+    return latest_alert
+
+# Add the callbacks to the app
 app.callback(
     Output('live-traffic-graph', 'figure'),
     Input('interval-component', 'n_intervals')
 )(update_graph_live)
 
+app.callback(
+    Output('alerts-container', 'children'),
+    Input('interval-component', 'n_intervals')
+)(update_alerts)
+
 # Packet sniffing function
 def packet_callback(packet):
-    global packet_data
+    global packet_data, alerts
     try:
         packet_info = {
             'length': len(packet),
@@ -98,6 +117,7 @@ def packet_callback(packet):
 
 # Run sniffing in a separate thread
 def start_sniffing():
+    from scapy.all import sniff
     sniff(prn=packet_callback, store=False)
 
 if __name__ == '__main__':
