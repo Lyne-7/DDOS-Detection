@@ -1,12 +1,17 @@
 # pip install Flask pandas matplotlib seaborn Werkzeug Flask-SQLAlchemy mysqlclien
-from flask import Flask, render_template, request,redirect,url_for,session
+from flask import Flask, render_template, request,redirect,url_for,session,flash
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pickle
+import dash
+from network_dashboard import create_dash_app
+
+import bcrypt
 from io import StringIO
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
+
 
 import google.generativeai as genai
 import os
@@ -40,18 +45,21 @@ attack_encoder = pickle.load(open("NSL-KDD/attack_encoder.pkl",'rb'))
 attack_rbscaler= pickle.load(open("NSL-KDD/attack_rbscaler.pkl",'rb'))
 
 
+# Initialize the Dash app and link it to the Flask app
+create_dash_app(app)
 
 
 
+# creating tables in database and storage------------------------------------------------------------------------------
 
-
-# creating tables in database and storage-------------------------------------------------------------------------------
 class Signup(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     fname = db.Column(db.String(100), nullable=False)
     lname = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100),unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
+
+
 
 #class Signin(db.Model):
 #    id = db.Column(db.Integer, primary_key=True)
@@ -75,6 +83,8 @@ def last_added_signup():
 
 @app.route("/")
 def home():
+    #user_id = 1  # For example, you might get this from the session
+    #user_name = get_user_name(user_id)
     return render_template('home.html')
 @app.route("/home")
 def home1():
@@ -89,57 +99,42 @@ def about():
 
 @app.route("/index")
 def index():
+    user_name = None
+    # Check if the user is signed in
     if is_signed_in():
-        return render_template('index.html')
+        user = Signup.query.get(session['id'])  # Assuming 'id' is stored in session
+        if user:
+            user_name = user.fname  # Assuming 'fname' is the user's first name
+        return render_template('index.html',user_name=user_name)
+    # If the user is signed up but not signed in
     elif is_signed_up():
         return render_template("home.html", message_must_sign="Please log in...")
+    # If the user is not signed up
     else:
         return render_template("home.html", message_must_sign="Please sign up...")
 
 
 @app.route("/analysis")
 def analysis():
-    if is_signed_in():
-        df = pd.read_csv("NSL-KDD/final_df.csv")
-        titles = df.columns.tolist()  # Convert to list for rendering
-
-        # Calculate statistics and store in variables
-        total_records = len(df)
-        total_features = len(df.columns)
-        num_attack_types = df['attack'].nunique()
-        most_frequent_attack = df['attack'].mode()[0]
-        avg_src_bytes = df['src_bytes'].mean()
-        avg_dst_bytes = df['dst_bytes'].mean()
-        avg_serror_rate = df['serror_rate'].mean()
-        percentage_logged_in = (df['logged_in'] == 1).mean() * 100
-        percentage_attacks = (df['attack'] == 1).mean() * 100
-        avg_same_srv_rate = df['same_srv_rate'].mean()
-
-        return render_template('analysis.html', titles=titles,
-                               df=df.head(10),total_features=total_features,total_records=total_records,num_attack_types=num_attack_types,most_frequent_attack=most_frequent_attack,
-                               avg_src_bytes=avg_src_bytes,avg_dst_bytes=avg_dst_bytes,avg_serror_rate=avg_serror_rate,percentage_logged_in=percentage_logged_in,
-                               percentage_attacks=percentage_attacks,avg_same_srv_rate=avg_same_srv_rate)
-
-    elif is_signed_up():
-        return render_template("home.html", message_must_sign="Please log in...")
-    else:
-        return render_template("home.html", message_must_sign="Please sign up...")
+    # This will render the Dash app
+    return redirect('/analysis/')
 
 # Route for signup page
 @app.route('/signup', methods=['POST', 'GET'])
 def signup():
     if request.method == 'POST':
-        fname = request.form.get('fname')
-        lname = request.form.get('lname')
+        fname = request.form.get('firstname')
+        lname = request.form.get('lastname')
         email = request.form.get('email')
         password = request.form.get('password')
 
         # Check if email is already registered
         if Signup.query.filter_by(email=email).first():
-            return render_template("home.html", signup_error="Email already registered.")
+            flash("Email already registered.", 'error')
+            return redirect('/signup')  # Redirect to signup to try again
 
         # Hash the password
-        hashed_password = generate_password_hash(password)
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
         # Create a new user
         new_user = Signup(fname=fname, lname=lname, email=email, password=hashed_password)
@@ -147,37 +142,52 @@ def signup():
         try:
             db.session.add(new_user)
             db.session.commit()
-            
+
             # Debug: Check if the user is added
             users = Signup.query.all()
             print(users)  # Log users to the console
-            
-            return render_template("home.html", signup_message="Sign up successful! Please log in.")
+
+            flash("Sign up successful! Please log in.", 'success')
+            return redirect('/signin')  # Redirect to sign in page after successful signup
+
         except Exception as e:
             print(f"Error occurred during signup: {e}")  # Log the error
             db.session.rollback()  # Rollback the session in case of error
-            return render_template("home.html", signup_error="An error occurred during sign up.")
+            flash("An error occurred during sign up.", 'error')
+            return redirect('/signup')
 
     return render_template("home.html")
 
 
+# Route for signin page
 @app.route('/signin', methods=['POST', 'GET'])
 def signin():
     if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
+        email = request.form.get('email')
+        password = request.form.get('password')
+
+        # Debugging: Ensure data retrieval
+        print(f"Email entered: {email}, Password entered: {password}")
 
         # Find user by email
         user = Signup.query.filter_by(email=email).first()
+        print(f"User found: {user}")
 
-        # Check password and log in
-        if user and check_password_hash(user.password, password):
-            session['id'] = user.id  # Store user ID in session
-            return render_template('home.html', signin_message=f'Welcome {user.fname} {user.lname}!')
+        if user:
+            # Check if the entered password matches the stored hashed password
+            if bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
+                session['id'] = user.id  # Store user ID in session
+                flash(f"Welcome {user.fname} {user.lname}!", 'success')
+                return redirect('/index')  # Redirect to a home or dashboard page
+            else:
+                flash("Invalid password.", 'error')
+                return redirect('/signin')  # Redirect to signin page to try again
         else:
-            return render_template('home.html', signin_error='Invalid email or password.')
+            flash("Email not registered.", 'error')
+            return redirect('/signin')  # Redirect to signin page
 
-    return render_template('home.html')
+    return render_template('index.html')
+
 
 
 
@@ -332,6 +342,14 @@ def delete_chat():
     chats = [chat for chat in chats if chat['id'] != chat_id]
     return jsonify({'status': f'Chat {chat_id} deleted successfully'})
 
+def get_user_name(user_id):
+    # Connect to your database
+    user = Signup.query.filter_by(id=user_id).first()  # Returns the first matching user or None
+    
+    if user:
+        return f"{user.fname}"
+    else:
+        return None
 # python main
 if __name__ == "__main__":
     app.run(debug=True)

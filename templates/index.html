@@ -144,9 +144,14 @@
     </div>
 
     <div class="ml-auto">
-        <button class="btn btn-custom" data-toggle="modal" data-target="#signInModal">Sign In</button>
-        <button class="btn btn-custom" data-toggle="modal" data-target="#signUpModal">Sign Up</button>
+        {% if user_name %}
+            <p style="font-size: 24px; color: #003366;">Welcome, {{ user_name }}!</p>
+        {% else %}
+            <button class="btn btn-custom" data-toggle="modal" data-target="#signInModal">Sign In</button>
+            <button class="btn btn-custom" data-toggle="modal" data-target="#signUpModal">Sign Up</button>
+        {% endif %}
     </div>
+    
 </nav>
 
 <div class="container">
